@@ -1,9 +1,5 @@
-################################################ VPC MODULE ################################################
 module "vpc" {
   source = "../../modules/vpc"
-
-  project_name = var.common_vars["project_name"]
-  environment  = var.common_vars["environment"]
 
   vpc_cidr_block = var.vpc["vpc_cidr_block"]
 

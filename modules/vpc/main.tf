@@ -1,9 +1,7 @@
 # Locals
 locals {
-  prefix = "${var.project_name}-${var.environment}"
-
+  prefix = "${var.common_tags["Project"]}-${var.common_tags["Environment"]}"
 }
-
 # VPC
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr_block
@@ -13,8 +11,8 @@ resource "aws_vpc" "main" {
     var.common_tags,
     {
       Name = "${local.prefix}-vpc"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
   )
 }
@@ -27,8 +25,8 @@ resource "aws_internet_gateway" "gw" {
     var.common_tags,
     {
       Name = "${local.prefix}-igw"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
 
   )
@@ -46,8 +44,8 @@ resource "aws_subnet" "public_subnets" {
     var.common_tags,
     {
       Name = "${local.prefix}-public-subnet-${split("-", var.availability_zone[count.index])[2]}"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
   )
 }
@@ -62,8 +60,8 @@ resource "aws_subnet" "private_subnets" {
     var.common_tags,
     {
       Name = "${local.prefix}-private-subnet-${split("-", var.availability_zone[count.index])[2]}"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
   )
 }
@@ -78,8 +76,8 @@ resource "aws_subnet" "db_subnets" {
     var.common_tags,
     {
       Name = "${local.prefix}-db-subnet-${split("-", var.availability_zone[count.index])[2]}"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
   )
 }
@@ -93,8 +91,8 @@ resource "aws_db_subnet_group" "default" {
     var.common_tags,
     {
       Name = "${local.prefix}-db-subnet-group"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
 
   )
@@ -108,8 +106,8 @@ resource "aws_route_table" "public_rt" {
     var.common_tags,
     {
       Name = "${local.prefix}-Public-RT"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
   )
 }
@@ -121,8 +119,8 @@ resource "aws_route_table" "private_rt" {
     var.common_tags,
     {
       Name = "${local.prefix}-Private-RT"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
   )
 }
@@ -134,8 +132,8 @@ resource "aws_route_table" "db_rt" {
     var.common_tags,
     {
       Name = "${local.prefix}-DB-RT"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
   )
 }
@@ -165,8 +163,8 @@ resource "aws_eip" "eip_nat" {
     var.common_tags,
     {
       Name = "${local.prefix}-eip"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
   )
 }
@@ -180,8 +178,8 @@ resource "aws_nat_gateway" "example" {
     var.common_tags,
     {
       Name = "${local.prefix}-nat-gateway"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
   )
 
@@ -264,8 +262,8 @@ resource "aws_flow_log" "example" {
     var.common_tags,
     {
       Name = "${local.prefix}-vpc-flow-logs-role-cw"
-      Environment = var.environment
-      Project     = var.project_name
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
     }
   )
 }
