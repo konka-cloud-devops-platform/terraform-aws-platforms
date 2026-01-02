@@ -9,11 +9,24 @@ common_vars = {
 vpc = {
     vpc_cidr_block            = "10.0.0.0/16"
     availability_zone         = ["ap-south-1a", "ap-south-1b", "ap-south-1c"]
-    public_subnet_cidr_blocks  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-    private_subnet_cidr_blocks = ["10.0.10.0/24", "10.0.20.0/24", "10.0.30.0/24"]
+    web_subnet_cidr_blocks  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+    app_subnet_cidr_blocks = ["10.0.10.0/24", "10.0.20.0/24", "10.0.30.0/24"]
     db_subnet_cidr_blocks      = ["10.0.100.0/24", "10.0.110.0/24", "10.0.120.0/24"]
     enable_nat_gateway        = false
     enable_vpc_flow_logs_cw   = false
+    enable_vpc_endpoints      = false
+    vpc_endpoints = {
+      s3_backup = {
+        service = "s3"
+        type    = "Gateway"
+        enabled = true
+      }
+      ecr_api = {
+        service = "ecr.api"
+        type    = "Interface"
+        enabled = true
+      }
+    }
 }
 
 sg = {
@@ -31,6 +44,8 @@ sg = {
     nodegroup_sg_description   = "Security group for EKS node groups"
     external_alb_sg_name       = "external_alb"
     external_alb_sg_description= "Security group for external ALB"
+    interface_endpoint_sg_name = "interface_endpoint"
+    interface_endpoint_sg_description = "Security group for VPC interface endpoints"
 }
 
 sg_rules = {
@@ -234,5 +249,15 @@ sg_rules = {
     description         = "This rule allows all traffic from internet to alb on port 443"
     cidr_blocks         = ["0.0.0.0/0"]
     security_group_name = "external_alb"
+  }
+
+  interface_endpoint = {
+    type                = "ingress"
+    from_port           = 443
+    to_port             = 443
+    protocol            = "tcp"
+    description         = "This rule allows all traffic from VPC to interface endpoints"
+    cidr_blocks         = ["0.0.0.0/0"]
+    security_group_name = "interface_endpoint"
   }
 }

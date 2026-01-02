@@ -3,14 +3,14 @@ output "vpc_id" {
   value       = aws_vpc.main.id
 }
 
-output "public_subnet_ids" {
-  description = "List of public subnet IDs"
-  value       = aws_subnet.public_subnets[*].id
+output "web_subnet_ids" {
+  description = "List of web subnet IDs"
+  value       = aws_subnet.web_subnets[*].id
 }
 
-output "private_subnet_ids" {
-  description = "List of public subnet IDs"
-  value       = aws_subnet.private_subnets[*].id
+output "app_subnet_ids" {
+  description = "List of app subnet IDs"
+  value       = aws_subnet.app_subnets[*].id
 }
 
 output "db_subnet_ids" {

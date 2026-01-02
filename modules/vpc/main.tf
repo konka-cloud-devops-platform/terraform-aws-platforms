@@ -1,8 +1,17 @@
-# Locals
+###############################################################################
+###############                  Locals                   #####################
+###############################################################################
 locals {
   prefix = "${var.common_tags["Project"]}-${var.common_tags["Environment"]}"
+  enabled_endpoints = {
+    for k, v in var.vpc_endpoints :
+    k => v if v.enabled
+  }
 }
-# VPC
+
+###############################################################################
+###############                  VPC                   #####################
+###############################################################################
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_support   = true
@@ -17,7 +26,9 @@ resource "aws_vpc" "main" {
   )
 }
 
-# IGW
+###############################################################################
+###############                     IGW                   #####################
+###############################################################################
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
@@ -32,34 +43,36 @@ resource "aws_internet_gateway" "gw" {
   )
 }
 
-# Public Private and DB Subnets
-resource "aws_subnet" "public_subnets" {
-  count                   = length(var.public_subnet_cidr_blocks)
+###############################################################################
+###############                Web,APP & DB Subnets       #####################
+###############################################################################
+resource "aws_subnet" "web_subnets" {
+  count                   = length(var.web_subnet_cidr_blocks)
   vpc_id                  = aws_vpc.main.id
   availability_zone       = var.availability_zone[count.index]
-  cidr_block              = var.public_subnet_cidr_blocks[count.index]
+  cidr_block              = var.web_subnet_cidr_blocks[count.index]
   map_public_ip_on_launch = true
 
   tags = merge(
     var.common_tags,
     {
-      Name = "${local.prefix}-public-subnet-${split("-", var.availability_zone[count.index])[2]}"
+      Name = "${local.prefix}-web-subnet-${split("-", var.availability_zone[count.index])[2]}"
       Environment = var.common_tags["Environment"]
       Project     = var.common_tags["Project"]
     }
   )
 }
 
-resource "aws_subnet" "private_subnets" {
-  count             = length(var.private_subnet_cidr_blocks)
+resource "aws_subnet" "app_subnets" {
+  count             = length(var.app_subnet_cidr_blocks)
   vpc_id            = aws_vpc.main.id
   availability_zone = var.availability_zone[count.index]
-  cidr_block        = var.private_subnet_cidr_blocks[count.index]
+  cidr_block        = var.app_subnet_cidr_blocks[count.index]
 
   tags = merge(
     var.common_tags,
     {
-      Name = "${local.prefix}-private-subnet-${split("-", var.availability_zone[count.index])[2]}"
+      Name = "${local.prefix}-app-subnet-${split("-", var.availability_zone[count.index])[2]}"
       Environment = var.common_tags["Environment"]
       Project     = var.common_tags["Project"]
     }
@@ -82,7 +95,9 @@ resource "aws_subnet" "db_subnets" {
   )
 }
 
-# DB asubnet group
+###############################################################################
+###############                DB Subnet Group            #####################
+###############################################################################
 resource "aws_db_subnet_group" "default" {
   name       = "${local.prefix}-db-subnet-group"
   subnet_ids = [for db_subnets in aws_subnet.db_subnets : db_subnets.id]
@@ -98,27 +113,30 @@ resource "aws_db_subnet_group" "default" {
   )
 }
 
-# Route Table for Public Private and DB Subnets
-resource "aws_route_table" "public_rt" {
+###############################################################################
+###############            Web,APP & DB Route Tables      #####################
+###############################################################################
+
+resource "aws_route_table" "web_rt" {
   vpc_id = aws_vpc.main.id
 
   tags = merge(
     var.common_tags,
     {
-      Name = "${local.prefix}-Public-RT"
+      Name = "${local.prefix}-web-RT"
       Environment = var.common_tags["Environment"]
       Project     = var.common_tags["Project"]
     }
   )
 }
 
-resource "aws_route_table" "private_rt" {
+resource "aws_route_table" "app_rt" {
   vpc_id = aws_vpc.main.id
 
   tags = merge(
     var.common_tags,
     {
-      Name = "${local.prefix}-Private-RT"
+      Name = "${local.prefix}-app-RT"
       Environment = var.common_tags["Environment"]
       Project     = var.common_tags["Project"]
     }
@@ -137,17 +155,20 @@ resource "aws_route_table" "db_rt" {
     }
   )
 }
+###############################################################################
+###############      Subnet Route Table Associations      #####################
+###############################################################################
 # Subnet Route Table Associations
-resource "aws_route_table_association" "public_subnet_association" {
-  count          = length(aws_subnet.public_subnets)
-  subnet_id      = aws_subnet.public_subnets[count.index].id
-  route_table_id = aws_route_table.public_rt.id
+resource "aws_route_table_association" "web_subnet_association" {
+  count          = length(aws_subnet.web_subnets)
+  subnet_id      = aws_subnet.web_subnets[count.index].id
+  route_table_id = aws_route_table.web_rt.id
 }
 
-resource "aws_route_table_association" "private_subnet_association" {
-  count          = length(aws_subnet.private_subnets)
-  subnet_id      = aws_subnet.private_subnets[count.index].id
-  route_table_id = aws_route_table.private_rt.id
+resource "aws_route_table_association" "app_subnet_association" {
+  count          = length(aws_subnet.app_subnets)
+  subnet_id      = aws_subnet.app_subnets[count.index].id
+  route_table_id = aws_route_table.app_rt.id
 }
 resource "aws_route_table_association" "db_subnet_association" {
   count          = length(aws_subnet.db_subnets)
@@ -155,7 +176,9 @@ resource "aws_route_table_association" "db_subnet_association" {
   route_table_id = aws_route_table.db_rt.id
 }
 
-# EIP
+###############################################################################
+###############                 Elastic IP                #####################
+###############################################################################
 resource "aws_eip" "eip_nat" {
   count  = var.enable_nat_gateway ? 1 : 0
   domain = "vpc"
@@ -168,11 +191,13 @@ resource "aws_eip" "eip_nat" {
     }
   )
 }
-# NatGW
+###############################################################################
+###############            NAT Gateway                    #####################
+###############################################################################
 resource "aws_nat_gateway" "example" {
   count         = var.enable_nat_gateway ? 1 : 0
   allocation_id = aws_eip.eip_nat[count.index].id
-  subnet_id     = aws_subnet.public_subnets[0].id
+  subnet_id     = aws_subnet.web_subnets[0].id
 
   tags = merge(
     var.common_tags,
@@ -186,16 +211,18 @@ resource "aws_nat_gateway" "example" {
   depends_on = [aws_internet_gateway.gw]
 }
 
-# Routes
-resource "aws_route" "public_route" {
-  route_table_id         = aws_route_table.public_rt.id
+###############################################################################
+###############            Web,APP & DB Routes             ####################
+###############################################################################
+resource "aws_route" "web_route" {
+  route_table_id         = aws_route_table.web_rt.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.gw.id
 }
 
-resource "aws_route" "private_nat_route" {
+resource "aws_route" "app_nat_route" {
   count                  = var.enable_nat_gateway ? 1 : 0
-  route_table_id         = aws_route_table.private_rt.id
+  route_table_id         = aws_route_table.app_rt.id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.example[count.index].id
 }
@@ -207,7 +234,9 @@ resource "aws_route" "db_nat_route" {
   nat_gateway_id         = aws_nat_gateway.example[count.index].id
 }
 
-# VPC Flow Logs CloudWatch
+###############################################################################
+###############            VPC Flow Logs CloudWatch       #####################
+###############################################################################
 
 data "aws_iam_policy_document" "assume_role" {
   count = var.enable_vpc_flow_logs_cw ? 1 : 0
@@ -274,3 +303,68 @@ resource "aws_cloudwatch_log_group" "example" {
   retention_in_days = 1
 }
 
+###############################################################################
+###############                VPC Endpoints              #####################
+###############################################################################
+# resource "aws_vpc_endpoint" "this" {
+#   for_each = var.enable_vpc_endpoints ? local.enabled_endpoints : {}
+
+#   vpc_id            = aws_vpc.main.id
+#   service_name      = "com.amazonaws.${var.region}.${each.value.service}"
+#   vpc_endpoint_type = each.value.type
+
+#   route_table_ids = each.value.type == "Gateway"? [ aws_route_table.app_rt.id,aws_route_table.db_rt.id] : null
+
+#   subnet_ids = each.value.type == "Interface" ?  values(aws_subnet.app_subnets)[*].id : null
+
+#   security_group_ids = each.value.type == "Interface" ? [ var.interface_endpoint_sg_id ]: null
+
+#   private_dns_enabled = each.value.type == "Interface" ? true : null
+
+#   tags = merge(
+#     var.common_tags,
+#     {
+#       Name        = "${local.prefix}-${replace(each.key, "_", "")}-endpoint"
+#       Environment = var.common_tags["Environment"]
+#       Project     = var.common_tags["Project"]
+#     }
+#   )
+# }
+
+
+resource "aws_vpc_endpoint" "this" {
+  for_each = var.enable_vpc_endpoints ? local.enabled_endpoints : {}
+
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.${var.region}.${each.value.service}"
+  vpc_endpoint_type = each.value.type
+
+  # Gateway endpoint → route tables
+  route_table_ids = each.value.type == "Gateway" ? [
+        aws_route_table.app_rt.id,
+        aws_route_table.db_rt.id ]: null
+
+  # Interface endpoint → app subnets
+  subnet_ids = each.value.type == "Interface" ? aws_subnet.app_subnets[*].id : null
+
+  # Interface endpoint → SG
+  security_group_ids = each.value.type == "Interface" ? [var.interface_endpoint_sg_id] : null
+
+  private_dns_enabled = each.value.type == "Interface" ? true : null
+
+  tags = merge(
+    var.common_tags,
+    {
+      Name        = "${local.prefix}-${replace(each.key, "_", "-")}-endpoint"
+      Environment = var.common_tags["Environment"]
+      Project     = var.common_tags["Project"]
+    }
+  )
+}
+
+
+
+# - vpc endpoints are added
+# - both gateway and interface types are supported
+# - need to be tested
+# - Why you're creating endpoints: to allow private connectivity to AWS services without using the internet

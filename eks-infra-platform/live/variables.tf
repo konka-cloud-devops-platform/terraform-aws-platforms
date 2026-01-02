@@ -9,33 +9,41 @@ variable "common_vars" {
 variable "vpc" {
   description = "VPC configuration"
   type = object({
-    vpc_cidr_block             = string
-    availability_zone          = list(string)
-    public_subnet_cidr_blocks  = list(string)
-    private_subnet_cidr_blocks = list(string)
-    db_subnet_cidr_blocks      = list(string)
-    enable_nat_gateway         = bool
-    enable_vpc_flow_logs_cw    = bool
+    vpc_cidr_block          = string
+    availability_zone       = list(string)
+    web_subnet_cidr_blocks  = list(string)
+    app_subnet_cidr_blocks  = list(string)
+    db_subnet_cidr_blocks   = list(string)
+    enable_nat_gateway      = bool
+    enable_vpc_flow_logs_cw = bool
+    enable_vpc_endpoints    = bool
+    vpc_endpoints = map(object({
+      service = string
+      type    = string # Gateway | Interface
+      enabled = bool
+    }))
   })
 }
 
 variable "sg" {
   description = "SG configuration"
   type = object({
-    bastion_sg_name             = string
-    bastion_sg_description      = string
-    vpn_sg_name                 = string
-    vpn_sg_description          = string
-    rds_sg_name                 = string
-    rds_sg_description          = string
-    elasticache_sg_name         = string
-    elasticache_sg_description  = string
-    controlplane_sg_name        = string
-    controlplane_sg_description = string
-    nodegroup_sg_name           = string
-    nodegroup_sg_description    = string
-    external_alb_sg_name        = string
-    external_alb_sg_description = string
+    bastion_sg_name                   = string
+    bastion_sg_description            = string
+    vpn_sg_name                       = string
+    vpn_sg_description                = string
+    rds_sg_name                       = string
+    rds_sg_description                = string
+    elasticache_sg_name               = string
+    elasticache_sg_description        = string
+    controlplane_sg_name              = string
+    controlplane_sg_description       = string
+    nodegroup_sg_name                 = string
+    nodegroup_sg_description          = string
+    external_alb_sg_name              = string
+    external_alb_sg_description       = string
+    interface_endpoint_sg_name        = string
+    interface_endpoint_sg_description = string
   })
 }
 

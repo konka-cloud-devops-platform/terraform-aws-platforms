@@ -3,14 +3,14 @@ output "vpc_id" {
   value       = module.vpc.vpc_id
 }
 
-output "public_subnet_ids" {
-  description = "List of public subnet IDs"
-  value       = module.vpc.public_subnet_ids
+output "web_subnet_ids" {
+  description = "List of web subnet IDs"
+  value       = module.vpc.web_subnet_ids
 }
 
-output "private_subnet_ids" {
-  description = "list of private subnet IDs"
-  value       = module.vpc.private_subnet_ids
+output "app_subnet_ids" {
+  description = "list of app subnet IDs"
+  value       = module.vpc.app_subnet_ids
 }
 
 output "db_subnet_ids" {
@@ -57,4 +57,9 @@ output "nodegroup" {
 output "external_alb" {
   description = "External ALB Sg ID"
   value       = module.external_alb.sg_id
+}
+
+output "interface_endpoint_sg" {
+  description = "Interface Endpoint Sg ID"
+  value       = module.interface_endpoint_sg.sg_id
 }

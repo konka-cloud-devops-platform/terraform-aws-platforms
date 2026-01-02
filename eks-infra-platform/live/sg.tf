@@ -51,6 +51,14 @@ module "external_alb" {
   vpc_id         = module.vpc.vpc_id
 }
 
+module "interface_endpoint_sg" {
+  source         = "../../modules/sg"
+  common_tags    = var.common_vars["common_tags"]
+  sg_name        = var.sg["interface_endpoint_sg_name"]
+  sg_description = var.sg["interface_endpoint_sg_description"]
+  vpc_id         = module.vpc.vpc_id
+}
+
 module "sg_rules" {
   source = "../../modules/sg_rules"
   rules  = local.resolved_sg_rules
