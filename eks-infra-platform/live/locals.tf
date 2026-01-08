@@ -9,8 +9,6 @@ locals {
     external_alb       = module.external_alb.sg_id
     interface_endpoint = module.interface_endpoint_sg.sg_id
   }
-
-
   resolved_sg_rules = {
     for name, rule in var.sg_rules :
     name => {
@@ -34,6 +32,4 @@ locals {
       ) ? local.sg_map[rule.source_security_group_name] : null
     }
   }
-
-
 }

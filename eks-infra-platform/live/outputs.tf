@@ -1,3 +1,6 @@
+#####################################################################################
+############################# VPC Outputs ###########################################
+#####################################################################################
 output "vpc_id" {
   description = "The ID of the VPC"
   value       = module.vpc.vpc_id
@@ -23,6 +26,10 @@ output "db_subnet_group_name" {
   value       = module.vpc.db_subnet_group_name
 }
 
+
+#####################################################################################
+########################### Security Group Outputs ##################################
+#####################################################################################
 output "bastion" {
   description = "Bastion Sg ID"
   value       = module.bastion.sg_id
@@ -62,4 +69,16 @@ output "external_alb" {
 output "interface_endpoint_sg" {
   description = "Interface Endpoint Sg ID"
   value       = module.interface_endpoint_sg.sg_id
+}
+
+#####################################################################################
+############################# IAM Outputs ###########################################
+#####################################################################################
+output "eks_cluster_iam_role_arn" {
+  description = "EKS Cluster IAM Role ARN"
+  value       = module.eks-iam.cluster_arn
+}
+output "eks_nodegroup_iam_role_arn" {
+  description = "EKS Nodegroup IAM Role ARN"
+  value       = module.eks-iam.node_arn
 }
