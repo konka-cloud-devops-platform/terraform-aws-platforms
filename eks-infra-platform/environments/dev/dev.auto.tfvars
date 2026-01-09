@@ -302,3 +302,19 @@ pod_identities = {
   ebs_namespace            = "kube-system"
   ebs_service_account_name = "ebs-csi-controller-sa"
 }
+
+access_entries = {
+  dev-admin-access = {
+    principal_arn     = "arn:aws:iam::384570460482:root"
+    policy_arn        = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
+    kubernetes_groups = []
+    access_scope      = "cluster"
+  }
+  dev-readonly-access = {
+    principal_arn     = "arn:aws:iam::384570460482:role/aws-reserved/sso.amazonaws.com/ap-south-1/AWSReservedSSO_AdministratorAccess_3be066592c063ff0"
+    policy_arn        = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
+    kubernetes_groups = ["dev-read", "dev-exec"]
+    access_scope      = "namespace"
+    namespaces        = ["dev"]
+  }
+}

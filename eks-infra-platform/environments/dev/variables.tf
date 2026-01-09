@@ -99,3 +99,13 @@ variable "pod_identities" {
     ebs_service_account_name = string
   })
 }
+variable "access_entries" {
+  description = "EKS access entries configuration"
+  type = map(object({
+    principal_arn     = string
+    kubernetes_groups = optional(list(string), [])
+    policy_arn        = string
+    access_scope      = string
+    namespaces        = optional(list(string), [])
+  }))
+}

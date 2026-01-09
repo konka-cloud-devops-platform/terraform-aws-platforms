@@ -1,3 +1,6 @@
+###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
+###                     EKS Cluster Module Invocation - Development Environment                      ###
+###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 module "eks_cluster" {
   source                                      = "../../../modules/eks/cluster"
   cluster_role_arn                            = module.eks-iam.cluster_arn
@@ -18,6 +21,10 @@ module "eks_cluster" {
   public_access_cidrs                         = var.eks["public_access_cidrs"]
 }
 
+###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
+###                     EKS Addons Module Invocation - Development Environment                       ###
+###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
+
 module "eks_addons" {
   source        = "../../../modules/eks/addons"
   for_each      = var.addons
@@ -26,6 +33,10 @@ module "eks_addons" {
   addon_version = each.value
   depends_on    = [module.eks_cluster]
 }
+
+###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
+###                      Pod Identity Module Invocation - Development Environment                    ###
+###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
 
 module "ebs_csi_pod_identity" {
   source               = "../../../modules/eks/iam-pod-identity"
@@ -37,4 +48,15 @@ module "ebs_csi_pod_identity" {
     module.iam_policies.policy_arns["ebs-csi-policy"]
   ]
   common_tags = var.common_vars["common_tags"]
+  depends_on  = [module.eks_cluster]
+}
+
+###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
+###                     Access Entry Module Invocation - Development Environment                     ###
+###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###
+module "eks_access" {
+  source       = "../../../modules/eks/access"
+  cluster_name = module.eks_cluster.cluster_id
+  access       = var.access_entries
+  depends_on   = [module.eks_cluster]
 }
