@@ -82,3 +82,20 @@ output "eks_nodegroup_iam_role_arn" {
   description = "EKS Nodegroup IAM Role ARN"
   value       = module.eks-iam.node_arn
 }
+
+#####################################################################################
+############################# EKS Outputs ###########################################
+#####################################################################################
+output "eks_cluster_arn" {
+  description = "EKS Cluster ARN"
+  value       = module.eks_cluster.cluster_arn
+}
+
+output "eks_cluster_endpoint" {
+  description = "EKS Cluster Endpoint"
+  value       = module.eks_cluster.cluster_endpoint
+}
+output "eks_cluster_id" {
+  description = "EKS Cluster ID"
+  value       = module.eks_cluster.cluster_id
+}

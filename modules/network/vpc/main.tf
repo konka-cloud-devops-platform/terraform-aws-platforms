@@ -7,6 +7,19 @@ locals {
     for k, v in var.vpc_endpoints :
     k => v if v.enabled
   }
+
+  eks_cluster_tags = var.enable_eks ? {
+    "kubernetes.io/cluster/${local.prefix}-eks-cluster" = "owned"
+  } : {}
+
+  internal_elb_tags = var.enable_internal_elb ? {
+    "kubernetes.io/role/internal-elb" = "1"
+  } : {}
+
+  external_elb_tags = var.enable_external_elb ? {
+    "kubernetes.io/role/elb" = "1"
+  } : {}
+
 }
 
 ###############################################################################
@@ -22,7 +35,8 @@ resource "aws_vpc" "main" {
       Name = "${local.prefix}-vpc"
       Environment = var.common_tags["Environment"]
       Project     = var.common_tags["Project"]
-    }
+    },
+    local.eks_cluster_tags
   )
 }
 
@@ -59,7 +73,9 @@ resource "aws_subnet" "web_subnets" {
       Name = "${local.prefix}-web-subnet-${split("-", var.availability_zone[count.index])[2]}"
       Environment = var.common_tags["Environment"]
       Project     = var.common_tags["Project"]
-    }
+    },
+    local.eks_cluster_tags,
+    local.external_elb_tags
   )
 }
 
@@ -75,7 +91,9 @@ resource "aws_subnet" "app_subnets" {
       Name = "${local.prefix}-app-subnet-${split("-", var.availability_zone[count.index])[2]}"
       Environment = var.common_tags["Environment"]
       Project     = var.common_tags["Project"]
-    }
+    },
+    local.eks_cluster_tags,
+    local.internal_elb_tags
   )
 }
 
@@ -91,7 +109,8 @@ resource "aws_subnet" "db_subnets" {
       Name = "${local.prefix}-db-subnet-${split("-", var.availability_zone[count.index])[2]}"
       Environment = var.common_tags["Environment"]
       Project     = var.common_tags["Project"]
-    }
+    },
+    local.eks_cluster_tags
   )
 }
 
@@ -306,32 +325,6 @@ resource "aws_cloudwatch_log_group" "example" {
 ###############################################################################
 ###############                VPC Endpoints              #####################
 ###############################################################################
-# resource "aws_vpc_endpoint" "this" {
-#   for_each = var.enable_vpc_endpoints ? local.enabled_endpoints : {}
-
-#   vpc_id            = aws_vpc.main.id
-#   service_name      = "com.amazonaws.${var.region}.${each.value.service}"
-#   vpc_endpoint_type = each.value.type
-
-#   route_table_ids = each.value.type == "Gateway"? [ aws_route_table.app_rt.id,aws_route_table.db_rt.id] : null
-
-#   subnet_ids = each.value.type == "Interface" ?  values(aws_subnet.app_subnets)[*].id : null
-
-#   security_group_ids = each.value.type == "Interface" ? [ var.interface_endpoint_sg_id ]: null
-
-#   private_dns_enabled = each.value.type == "Interface" ? true : null
-
-#   tags = merge(
-#     var.common_tags,
-#     {
-#       Name        = "${local.prefix}-${replace(each.key, "_", "")}-endpoint"
-#       Environment = var.common_tags["Environment"]
-#       Project     = var.common_tags["Project"]
-#     }
-#   )
-# }
-
-
 resource "aws_vpc_endpoint" "this" {
   for_each = var.enable_vpc_endpoints ? local.enabled_endpoints : {}
 

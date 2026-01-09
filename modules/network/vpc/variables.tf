@@ -69,3 +69,18 @@ variable "interface_endpoint_sg_id" {
   description = "Interface endpoint sg id"
   type = string 
 }
+
+variable "enable_eks" {
+  type    = bool
+  default = false
+}
+
+variable "enable_internal_elb" {
+  type    = bool
+  default = false
+}
+
+variable "enable_external_elb" {
+  type    = bool
+  default = false
+}

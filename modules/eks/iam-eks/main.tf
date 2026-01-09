@@ -2,7 +2,15 @@ locals {
   prefix = "${var.common_tags["Project"]}-${var.common_tags["Environment"]}"
   node_policies = [
     "arn:aws:iam::aws:policy/AmazonEKSWorkerNodeMinimalPolicy",
-    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly"
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly",
+    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  ]
+  cluster_policies = [
+    "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+    "arn:aws:iam::aws:policy/AmazonEKSComputePolicy",
+    "arn:aws:iam::aws:policy/AmazonEKSBlockStoragePolicy",
+    "arn:aws:iam::aws:policy/AmazonEKSLoadBalancingPolicy",
+    "arn:aws:iam::aws:policy/AmazonEKSNetworkingPolicy"
   ]
 }
 
@@ -36,8 +44,9 @@ resource "aws_iam_role" "cluster" {
   )
 }
 
-resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSClusterPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+resource "aws_iam_role_policy_attachment" "cluster" {
+  for_each   = toset(local.cluster_policies)
+  policy_arn = each.value
   role       = aws_iam_role.cluster.name
 }
 ##############################################################################

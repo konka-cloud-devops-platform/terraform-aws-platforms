@@ -208,6 +208,7 @@ sg_rules = {
     source_security_group_name  = "controlplane"
   }
 
+
   nodegroup_self = {
     type                = "ingress"
     from_port           = 0
@@ -261,3 +262,34 @@ sg_rules = {
     security_group_name = "interface_endpoint"
   }
 }
+
+# EKS Node Groups Configuration
+eks = {
+  authentication_mode = "API_AND_CONFIG_MAP"
+  cluster_version     = "1.34"
+  endpoint_private_access = true
+  endpoint_public_access  = true
+  enabled_cluster_log_types = [ "api","audit","authenticator","controllerManager","scheduler"]
+  bootstrap_cluster_creator_admin_permissions = true
+  deletion_protection         = false
+  public_access_cidrs         = ["0.0.0.0/0"]
+
+  node_groups = {
+    dev-ng-1 = {
+      instance_type  = ["t3a.medium"]
+      desired_size   = 1
+      max_size       = 4
+      min_size       = 1
+      capacity_type  = "ON_DEMAND"
+    }
+  }
+  addons = {
+    vpc-cni = "v1.21.1-eksbuild.1"
+    metrics-server = "v0.8.0-eksbuild.6"
+    eks-pod-identity-agent  = "v1.3.10-eksbuild.2"
+    # aws-ebs-csi-driver = "v1.45.0-eksbuild.2"
+    # external-dns = "v0.18.0-eksbuild.1"
+  }
+}
+
+# aws eks describe-addon-versions   --kubernetes-version 1.33   --addon-name eks-pod-identity-agent   --query "addons[0].addonVersions[].addonVersion"   --output table

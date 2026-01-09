@@ -75,16 +75,16 @@ terraform init \
 if [ "$ACTION_CHOICE" == "1" ]; then
   echo ""
   echo "▶ Terraform Format"
-  terraform fmt
+  time terraform fmt
 
   echo ""
   echo "▶ Terraform Validate"
-  terraform validate
+  time terraform validate
 
   echo ""
   read -p "⚠️  Do you want to APPLY infrastructure? (yes/no): " CONFIRM
   if [[ "$CONFIRM" == "yes" ]]; then
-    terraform apply \
+    time terraform apply \
       -var-file="$ENV_PATH/$ENV.tfvars"
   else
     echo "❌ Apply cancelled."
@@ -94,7 +94,7 @@ elif [ "$ACTION_CHOICE" == "2" ]; then
   echo ""
   read -p "⚠️  Do you want to DESTROY infrastructure? (yes/no): " CONFIRM
   if [[ "$CONFIRM" == "yes" ]]; then
-    terraform destroy \
+    time terraform destroy \
       -var-file="$ENV_PATH/$ENV.tfvars"
   else
     echo "❌ Destroy cancelled."
