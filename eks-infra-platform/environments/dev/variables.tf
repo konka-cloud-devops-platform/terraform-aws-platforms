@@ -91,3 +91,11 @@ variable "addons" {
   description = "EKS addons as map(addon_name => addon_version)"
   type        = map(string)
 }
+variable "pod_identities" {
+  description = "EKS Pod Identities configuration"
+  type = object({
+    ebs_identity_name        = string
+    ebs_namespace            = string
+    ebs_service_account_name = string
+  })
+}

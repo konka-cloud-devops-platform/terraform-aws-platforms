@@ -26,3 +26,15 @@ module "eks_addons" {
   addon_version = each.value
   depends_on    = [module.eks_cluster]
 }
+
+module "ebs_csi_pod_identity" {
+  source               = "../../../modules/eks/iam-pod-identity"
+  cluster_name         = module.eks_cluster.cluster_id
+  identity_name        = var.pod_identities["ebs_identity_name"]
+  namespace            = var.pod_identities["ebs_namespace"]
+  service_account_name = var.pod_identities["ebs_service_account_name"]
+  policy_arns = [
+    module.iam_policies.policy_arns["ebs-csi-policy"]
+  ]
+  common_tags = var.common_vars["common_tags"]
+}

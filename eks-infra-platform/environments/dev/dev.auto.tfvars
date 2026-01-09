@@ -280,7 +280,7 @@ eks = {
   node_groups = {
     dev-ng-1 = {
       instance_type = ["t3a.medium"]
-      desired_size  = 1
+      desired_size  = 2
       max_size      = 4
       min_size      = 1
       capacity_type = "ON_DEMAND"
@@ -288,11 +288,17 @@ eks = {
   }
 }
 
-# aws eks describe-addon-versions   --kubernetes-version 1.33   --addon-name eks-pod-identity-agent   --query "addons[0].addonVersions[].addonVersion"   --output table
+# aws eks describe-addon-versions   --kubernetes-version 1.33   --addon-name aws-ebs-csi-driver   --query "addons[0].addonVersions[].addonVersion"   --output table
 addons = {
   vpc-cni                = "v1.21.1-eksbuild.1"
   metrics-server         = "v0.8.0-eksbuild.6"
   eks-pod-identity-agent = "v1.3.10-eksbuild.2"
-  # aws-ebs-csi-driver = "v1.45.0-eksbuild.2"
+  aws-ebs-csi-driver     = "v1.54.0-eksbuild.1"
   # external-dns = "v0.18.0-eksbuild.1"
+}
+
+pod_identities = {
+  ebs_identity_name        = "ebs-csi"
+  ebs_namespace            = "kube-system"
+  ebs_service_account_name = "ebs-csi-controller-sa"
 }
