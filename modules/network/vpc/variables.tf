@@ -70,17 +70,17 @@ variable "interface_endpoint_sg_id" {
   type = string 
 }
 
-variable "enable_eks" {
+variable "enable_eks_cluster_tags" {
   type    = bool
   default = false
 }
 
-variable "enable_internal_elb" {
+variable "enable_internal_elb_tags" {
   type    = bool
   default = false
 }
 
-variable "enable_external_elb" {
+variable "enable_external_elb_tags" {
   type    = bool
   default = false
 }

@@ -1,5 +1,5 @@
 module "bastion" {
-  source         = "../../modules/sg"
+  source         = "../../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["bastion_sg_name"]
   sg_description = var.sg["bastion_sg_description"]
@@ -7,14 +7,14 @@ module "bastion" {
 }
 
 module "vpn" {
-  source         = "../../modules/sg"
+  source         = "../../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["vpn_sg_name"]
   sg_description = var.sg["vpn_sg_description"]
   vpc_id         = module.vpc.vpc_id
 }
 module "rds" {
-  source         = "../../modules/sg"
+  source         = "../../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["rds_sg_name"]
   sg_description = var.sg["rds_sg_description"]
@@ -22,21 +22,21 @@ module "rds" {
 }
 
 module "elasticache" {
-  source         = "../../modules/sg"
+  source         = "../../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["elasticache_sg_name"]
   sg_description = var.sg["elasticache_sg_description"]
   vpc_id         = module.vpc.vpc_id
 }
 module "controlplane" {
-  source         = "../../modules/sg"
+  source         = "../../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["controlplane_sg_name"]
   sg_description = var.sg["controlplane_sg_description"]
   vpc_id         = module.vpc.vpc_id
 }
 module "nodegroup" {
-  source         = "../../modules/sg"
+  source         = "../../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["nodegroup_sg_name"]
   sg_description = var.sg["nodegroup_sg_description"]
@@ -44,7 +44,7 @@ module "nodegroup" {
 }
 
 module "external_alb" {
-  source         = "../../modules/sg"
+  source         = "../../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["external_alb_sg_name"]
   sg_description = var.sg["external_alb_sg_description"]
@@ -52,7 +52,7 @@ module "external_alb" {
 }
 
 module "interface_endpoint_sg" {
-  source         = "../../modules/sg"
+  source         = "../../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["interface_endpoint_sg_name"]
   sg_description = var.sg["interface_endpoint_sg_description"]
@@ -60,6 +60,6 @@ module "interface_endpoint_sg" {
 }
 
 module "sg_rules" {
-  source = "../../modules/sg_rules"
+  source = "../../../modules/network/sg_rules"
   rules  = local.resolved_sg_rules
 }

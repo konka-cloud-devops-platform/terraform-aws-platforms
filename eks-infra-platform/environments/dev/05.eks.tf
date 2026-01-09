@@ -1,5 +1,5 @@
 module "eks_cluster" {
-  source                                      = "../../modules/eks"
+  source                                      = "../../../modules/eks/cluster"
   cluster_role_arn                            = module.eks-iam.cluster_arn
   cluster_subnet_ids                          = module.vpc.web_subnet_ids
   cluster_security_group_ids                  = [module.controlplane.sg_id]
@@ -16,5 +16,13 @@ module "eks_cluster" {
   bootstrap_cluster_creator_admin_permissions = var.eks["bootstrap_cluster_creator_admin_permissions"]
   deletion_protection                         = var.eks["deletion_protection"]
   public_access_cidrs                         = var.eks["public_access_cidrs"]
-  addons                                      = var.eks["addons"]
+}
+
+module "eks_addons" {
+  source        = "../../../modules/eks/addons"
+  for_each      = var.addons
+  cluster_name  = module.eks_cluster.cluster_id
+  addon_name    = each.key
+  addon_version = each.value
+  depends_on    = [module.eks_cluster]
 }

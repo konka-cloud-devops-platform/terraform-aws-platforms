@@ -1,5 +1,5 @@
 common_vars = {
-  aws_region  = "ap-south-1"
+  aws_region = "ap-south-1"
   common_tags = {
     Owner       = "konka"
     Environment = "dev"
@@ -7,45 +7,48 @@ common_vars = {
   }
 }
 vpc = {
-    vpc_cidr_block            = "10.0.0.0/16"
-    availability_zone         = ["ap-south-1a", "ap-south-1b"]
-    web_subnet_cidr_blocks  = ["10.0.1.0/24", "10.0.2.0/24"]
-    app_subnet_cidr_blocks = ["10.0.10.0/24", "10.0.20.0/24"]
-    db_subnet_cidr_blocks      = ["10.0.100.0/24", "10.0.110.0/24"]
-    enable_nat_gateway        = false
-    enable_vpc_flow_logs_cw   = false
-    enable_vpc_endpoints      = false
-    vpc_endpoints = {
-      s3_backup = {
-        service = "s3"
-        type    = "Gateway"
-        enabled = true
-      }
-      ecr_api = {
-        service = "ecr.api"
-        type    = "Interface"
-        enabled = true
-      }
+  vpc_cidr_block           = "10.0.0.0/16"
+  availability_zone        = ["ap-south-1a", "ap-south-1b"]
+  web_subnet_cidr_blocks   = ["10.0.1.0/24", "10.0.2.0/24"]
+  app_subnet_cidr_blocks   = ["10.0.10.0/24", "10.0.20.0/24"]
+  db_subnet_cidr_blocks    = ["10.0.100.0/24", "10.0.110.0/24"]
+  enable_nat_gateway       = false
+  enable_vpc_flow_logs_cw  = false
+  enable_vpc_endpoints     = false
+  enable_eks_cluster_tags  = true
+  enable_internal_elb_tags = true
+  enable_external_elb_tags = true
+  vpc_endpoints = {
+    s3_backup = {
+      service = "s3"
+      type    = "Gateway"
+      enabled = true
     }
+    ecr_api = {
+      service = "ecr.api"
+      type    = "Interface"
+      enabled = true
+    }
+  }
 }
 
 sg = {
-    bastion_sg_name            = "bastion"
-    bastion_sg_description     = "Security group for bastion hosts"
-    vpn_sg_name                = "vpn"
-    vpn_sg_description         = "Security group for VPN"
-    rds_sg_name                = "rds"
-    rds_sg_description         = "Security group for RDS instances"
-    elasticache_sg_name        = "elasticache"
-    elasticache_sg_description = "Security group for ElastiCache"
-    controlplane_sg_name       = "controlplane"
-    controlplane_sg_description= "Security group for EKS control plane"
-    nodegroup_sg_name          = "nodegroup"
-    nodegroup_sg_description   = "Security group for EKS node groups"
-    external_alb_sg_name       = "external_alb"
-    external_alb_sg_description= "Security group for external ALB"
-    interface_endpoint_sg_name = "interface_endpoint"
-    interface_endpoint_sg_description = "Security group for VPC interface endpoints"
+  bastion_sg_name                   = "bastion"
+  bastion_sg_description            = "Security group for bastion hosts"
+  vpn_sg_name                       = "vpn"
+  vpn_sg_description                = "Security group for VPN"
+  rds_sg_name                       = "rds"
+  rds_sg_description                = "Security group for RDS instances"
+  elasticache_sg_name               = "elasticache"
+  elasticache_sg_description        = "Security group for ElastiCache"
+  controlplane_sg_name              = "controlplane"
+  controlplane_sg_description       = "Security group for EKS control plane"
+  nodegroup_sg_name                 = "nodegroup"
+  nodegroup_sg_description          = "Security group for EKS node groups"
+  external_alb_sg_name              = "external_alb"
+  external_alb_sg_description       = "Security group for external ALB"
+  interface_endpoint_sg_name        = "interface_endpoint"
+  interface_endpoint_sg_description = "Security group for VPC interface endpoints"
 }
 
 sg_rules = {
@@ -115,8 +118,8 @@ sg_rules = {
     to_port                    = 3306
     protocol                   = "tcp"
     description                = "This rule allows all traffic from nodegroup to rds on 3306"
-    security_group_name         = "rds"
-    source_security_group_name  = "nodegroup"
+    security_group_name        = "rds"
+    source_security_group_name = "nodegroup"
   }
 
   vpn_rds = {
@@ -125,8 +128,8 @@ sg_rules = {
     to_port                    = 3306
     protocol                   = "tcp"
     description                = "This rule allows all traffic from vpn to rds on 3306"
-    security_group_name         = "rds"
-    source_security_group_name  = "vpn"
+    security_group_name        = "rds"
+    source_security_group_name = "vpn"
   }
 
   bastion_rds = {
@@ -135,8 +138,8 @@ sg_rules = {
     to_port                    = 3306
     protocol                   = "tcp"
     description                = "This rule allows all traffic from bastion to rds on 3306"
-    security_group_name         = "rds"
-    source_security_group_name  = "bastion"
+    security_group_name        = "rds"
+    source_security_group_name = "bastion"
   }
 
   # -----------------------
@@ -148,8 +151,8 @@ sg_rules = {
     to_port                    = 6379
     protocol                   = "tcp"
     description                = "This rule allows all traffic from nodegroup to elasticache on 6379"
-    security_group_name         = "elasticache"
-    source_security_group_name  = "nodegroup"
+    security_group_name        = "elasticache"
+    source_security_group_name = "nodegroup"
   }
 
   vpn_elasticache = {
@@ -158,8 +161,8 @@ sg_rules = {
     to_port                    = 6379
     protocol                   = "tcp"
     description                = "This rule allows all traffic from vpn to elasticache on 6379"
-    security_group_name         = "elasticache"
-    source_security_group_name  = "vpn"
+    security_group_name        = "elasticache"
+    source_security_group_name = "vpn"
   }
 
   bastion_elasticache = {
@@ -168,8 +171,8 @@ sg_rules = {
     to_port                    = 6379
     protocol                   = "tcp"
     description                = "This rule allows all traffic from bastion to elasticache on 6379"
-    security_group_name         = "elasticache"
-    source_security_group_name  = "bastion"
+    security_group_name        = "elasticache"
+    source_security_group_name = "bastion"
   }
 
   # -----------------------
@@ -191,8 +194,8 @@ sg_rules = {
     to_port                    = 0
     protocol                   = "-1"
     description                = "This rule allows all traffic from nodegroup to controlplane"
-    security_group_name         = "controlplane"
-    source_security_group_name  = "nodegroup"
+    security_group_name        = "controlplane"
+    source_security_group_name = "nodegroup"
   }
 
   # -----------------------
@@ -204,8 +207,8 @@ sg_rules = {
     to_port                    = 0
     protocol                   = "-1"
     description                = "This rule allows all traffic from controlplane to nodegroup"
-    security_group_name         = "nodegroup"
-    source_security_group_name  = "controlplane"
+    security_group_name        = "nodegroup"
+    source_security_group_name = "controlplane"
   }
 
 
@@ -225,8 +228,8 @@ sg_rules = {
     to_port                    = 32767
     protocol                   = "tcp"
     description                = "This rule allows all traffic from alb to nodegroup on nodeport range"
-    security_group_name         = "nodegroup"
-    source_security_group_name  = "external_alb"
+    security_group_name        = "nodegroup"
+    source_security_group_name = "external_alb"
   }
 
   # -----------------------
@@ -265,31 +268,31 @@ sg_rules = {
 
 # EKS Node Groups Configuration
 eks = {
-  authentication_mode = "API_AND_CONFIG_MAP"
-  cluster_version     = "1.34"
-  endpoint_private_access = true
-  endpoint_public_access  = true
-  enabled_cluster_log_types = [ "api","audit","authenticator","controllerManager","scheduler"]
+  authentication_mode                         = "API_AND_CONFIG_MAP"
+  cluster_version                             = "1.33"
+  endpoint_private_access                     = true
+  endpoint_public_access                      = true
+  enabled_cluster_log_types                   = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   bootstrap_cluster_creator_admin_permissions = true
-  deletion_protection         = false
-  public_access_cidrs         = ["0.0.0.0/0"]
+  deletion_protection                         = false
+  public_access_cidrs                         = ["0.0.0.0/0"]
 
   node_groups = {
     dev-ng-1 = {
-      instance_type  = ["t3a.medium"]
-      desired_size   = 1
-      max_size       = 4
-      min_size       = 1
-      capacity_type  = "ON_DEMAND"
+      instance_type = ["t3a.medium"]
+      desired_size  = 1
+      max_size      = 4
+      min_size      = 1
+      capacity_type = "ON_DEMAND"
     }
-  }
-  addons = {
-    vpc-cni = "v1.21.1-eksbuild.1"
-    metrics-server = "v0.8.0-eksbuild.6"
-    eks-pod-identity-agent  = "v1.3.10-eksbuild.2"
-    # aws-ebs-csi-driver = "v1.45.0-eksbuild.2"
-    # external-dns = "v0.18.0-eksbuild.1"
   }
 }
 
 # aws eks describe-addon-versions   --kubernetes-version 1.33   --addon-name eks-pod-identity-agent   --query "addons[0].addonVersions[].addonVersion"   --output table
+addons = {
+  vpc-cni                = "v1.21.1-eksbuild.1"
+  metrics-server         = "v0.8.0-eksbuild.6"
+  eks-pod-identity-agent = "v1.3.10-eksbuild.2"
+  # aws-ebs-csi-driver = "v1.45.0-eksbuild.2"
+  # external-dns = "v0.18.0-eksbuild.1"
+}

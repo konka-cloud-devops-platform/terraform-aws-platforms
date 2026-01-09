@@ -55,7 +55,6 @@ case $ENV_CHOICE in
 esac
 
 ENV_PATH="$PROJECT_PATH/environments/$ENV"
-LIVE_PATH="$PROJECT_PATH/live"
 
 # Select action
 echo ""
@@ -64,13 +63,12 @@ echo "1. Provision"
 echo "2. Destroy"
 read -p "Enter choice: " ACTION_CHOICE
 
-cd "$LIVE_PATH"
+cd "$ENV_PATH"
 
 # Terraform Init
 echo ""
 echo "▶ Terraform Init"
-terraform init \
-  -backend-config="$ENV_PATH/backend.tfvars"
+terraform init
 
 if [ "$ACTION_CHOICE" == "1" ]; then
   echo ""
@@ -84,8 +82,7 @@ if [ "$ACTION_CHOICE" == "1" ]; then
   echo ""
   read -p "⚠️  Do you want to APPLY infrastructure? (yes/no): " CONFIRM
   if [[ "$CONFIRM" == "yes" ]]; then
-    time terraform apply \
-      -var-file="$ENV_PATH/$ENV.tfvars"
+    time terraform apply
   else
     echo "❌ Apply cancelled."
   fi
@@ -94,8 +91,7 @@ elif [ "$ACTION_CHOICE" == "2" ]; then
   echo ""
   read -p "⚠️  Do you want to DESTROY infrastructure? (yes/no): " CONFIRM
   if [[ "$CONFIRM" == "yes" ]]; then
-    time terraform destroy \
-      -var-file="$ENV_PATH/$ENV.tfvars"
+    time terraform destroy
   else
     echo "❌ Destroy cancelled."
   fi

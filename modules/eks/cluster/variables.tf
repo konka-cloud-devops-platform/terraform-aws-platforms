@@ -83,7 +83,3 @@ variable "node_role_arn" {
   type = string
 }
 
-variable "addons" {
-  description = "EKS addons as map(addon_name => addon_version)"
-  type        = map(string)
-}

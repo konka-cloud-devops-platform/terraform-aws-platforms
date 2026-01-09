@@ -8,15 +8,15 @@ locals {
     k => v if v.enabled
   }
 
-  eks_cluster_tags = var.enable_eks ? {
+  eks_cluster_tags = var.enable_eks_cluster_tags ? {
     "kubernetes.io/cluster/${local.prefix}-eks-cluster" = "owned"
   } : {}
 
-  internal_elb_tags = var.enable_internal_elb ? {
+  internal_elb_tags = var.enable_internal_elb_tags ? {
     "kubernetes.io/role/internal-elb" = "1"
   } : {}
 
-  external_elb_tags = var.enable_external_elb ? {
+  external_elb_tags = var.enable_external_elb_tags ? {
     "kubernetes.io/role/elb" = "1"
   } : {}
 

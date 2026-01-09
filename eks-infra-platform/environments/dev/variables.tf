@@ -9,14 +9,17 @@ variable "common_vars" {
 variable "vpc" {
   description = "VPC configuration"
   type = object({
-    vpc_cidr_block          = string
-    availability_zone       = list(string)
-    web_subnet_cidr_blocks  = list(string)
-    app_subnet_cidr_blocks  = list(string)
-    db_subnet_cidr_blocks   = list(string)
-    enable_nat_gateway      = bool
-    enable_vpc_flow_logs_cw = bool
-    enable_vpc_endpoints    = bool
+    vpc_cidr_block           = string
+    availability_zone        = list(string)
+    web_subnet_cidr_blocks   = list(string)
+    app_subnet_cidr_blocks   = list(string)
+    db_subnet_cidr_blocks    = list(string)
+    enable_nat_gateway       = bool
+    enable_vpc_flow_logs_cw  = bool
+    enable_vpc_endpoints     = bool
+    enable_eks_cluster_tags  = bool
+    enable_internal_elb_tags = bool
+    enable_external_elb_tags = bool
     vpc_endpoints = map(object({
       service = string
       type    = string # Gateway | Interface
@@ -74,7 +77,6 @@ variable "eks" {
     bootstrap_cluster_creator_admin_permissions = bool
     deletion_protection                         = bool
     public_access_cidrs                         = list(string)
-    addons                                      = map(string)
     node_groups = map(object({
       instance_type = list(string)
       desired_size  = number
@@ -85,3 +87,7 @@ variable "eks" {
   })
 }
 
+variable "addons" {
+  description = "EKS addons as map(addon_name => addon_version)"
+  type        = map(string)
+}

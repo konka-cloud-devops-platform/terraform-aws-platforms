@@ -1,5 +1,5 @@
 module "vpc" {
-  source = "../../modules/vpc"
+  source = "../../../modules/network/vpc"
 
   vpc_cidr_block = var.vpc["vpc_cidr_block"]
 
@@ -17,4 +17,7 @@ module "vpc" {
   enable_vpc_endpoints     = var.vpc["enable_vpc_endpoints"]
   vpc_endpoints            = var.vpc["vpc_endpoints"]
   interface_endpoint_sg_id = module.interface_endpoint_sg.sg_id
+  enable_eks_cluster_tags  = var.vpc["enable_eks_cluster_tags"]
+  enable_internal_elb_tags = var.vpc["enable_internal_elb_tags"]
+  enable_external_elb_tags = var.vpc["enable_external_elb_tags"]
 }
