@@ -1,0 +1,36 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameter",
+                "ssm:GetParameters"
+            ],
+            "Resource": [
+                "arn:aws:ssm:ap-south-1:384570460482:parameter/3-tier/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetSecretValue"
+            ],
+            "Resource": [
+                "arn:aws:secretsmanager:ap-south-1:384570460482:secret:3-tier/secrets-bqgn5E"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::ullagalliu-artifacts", 
+                "arn:aws:s3:::ullagalliu-artifacts/backend/*"
+            ]
+        }
+
+    ]
+}

@@ -2,7 +2,8 @@
 ###############                  Locals                   #####################
 ###############################################################################
 locals {
-  prefix = "${var.common_tags["Project"]}-${var.common_tags["Environment"]}"
+  prefix = "${var.common_tags["Environment"]}-${var.common_tags["Project"]}"
+  
   enabled_endpoints = {
     for k, v in var.vpc_endpoints :
     k => v if v.enabled

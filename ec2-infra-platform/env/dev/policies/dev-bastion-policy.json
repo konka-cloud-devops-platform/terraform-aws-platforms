@@ -1,0 +1,54 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+
+    {
+      "Sid": "SSMParameterAccessRDSHost",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameter",
+        "ssm:GetParameters"
+      ],
+      "Resource": "arn:aws:ssm:ap-south-1:384570460482:parameter/moneylag/rds/host"
+    },
+
+    {
+      "Sid": "SSMParameterAccessPrivateKey",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameter",
+        "ssm:GetParameters"
+      ],
+      "Resource": "arn:aws:ssm:ap-south-1:384570460482:parameter/ssh/siva"
+    },
+
+    {
+      "Sid": "SecretsManagerAccess",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "arn:aws:secretsmanager:ap-south-1:384570460482:secret:3-tier/secrets-bqgn5E*"
+    },
+
+    {
+      "Sid": "S3SchemaReadAccess",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::ullagalliu-artifacts/schema/schema.sql"
+    },
+
+    {
+      "Sid": "CloudWatchLogsForUserdata",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

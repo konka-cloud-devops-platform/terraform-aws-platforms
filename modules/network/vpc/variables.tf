@@ -67,7 +67,8 @@ variable "vpc_endpoints" {
   
 variable "interface_endpoint_sg_id" {
   description = "Interface endpoint sg id"
-  type = string 
+  type = string
+  default = ""
 }
 
 variable "enable_eks_cluster_tags" {
