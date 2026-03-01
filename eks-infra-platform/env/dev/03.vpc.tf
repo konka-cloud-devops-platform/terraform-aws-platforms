@@ -1,3 +1,6 @@
+#-----------------------------------------------------------------------------#
+###                         VPC Component                                   ###
+#-----------------------------------------------------------------------------#
 module "vpc" {
   source = "../../../modules/network/vpc"
 
@@ -16,8 +19,11 @@ module "vpc" {
   region                   = var.common_vars["aws_region"]
   enable_vpc_endpoints     = var.vpc["enable_vpc_endpoints"]
   vpc_endpoints            = var.vpc["vpc_endpoints"]
-  interface_endpoint_sg_id = module.interface_endpoint_sg.sg_id
+  # interface_endpoint_sg_id = module.interface_endpoint_sg.sg_id
   enable_eks_cluster_tags  = var.vpc["enable_eks_cluster_tags"]
   enable_internal_elb_tags = var.vpc["enable_internal_elb_tags"]
   enable_external_elb_tags = var.vpc["enable_external_elb_tags"]
 }
+#-----------------------------------------------------------------------------#
+###                           Security Groups                               ###
+#-----------------------------------------------------------------------------#
