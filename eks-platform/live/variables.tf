@@ -65,3 +65,37 @@ variable "sg_rules" {
     self                       = optional(bool)
   }))
 }
+
+variable "iam_roles" {
+  type = map(object({
+    role_name       = string
+    trusted_service = string
+    policy_arns     = list(string)
+    inline_policies = map(string)
+  }))
+}
+
+variable "eks" {
+  description = "EKS cluster configuration"
+  type = object({
+    authentication_mode                         = string
+    cluster_version                             = string
+    endpoint_private_access                     = bool
+    endpoint_public_access                      = bool
+    enabled_cluster_log_types                   = list(string)
+    bootstrap_cluster_creator_admin_permissions = bool
+    deletion_protection                         = bool
+    public_access_cidrs                         = list(string)
+    node_groups = map(object({
+      instance_type = list(string)
+      desired_size  = number
+      max_size      = number
+      min_size      = number
+      capacity_type = string
+    }))
+  })
+}
+variable "addons" {
+  description = "EKS addons configuration"
+  type        = map(string)
+}

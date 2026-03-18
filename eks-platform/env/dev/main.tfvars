@@ -266,3 +266,71 @@ sg_rules = {
     security_group_name = "interface_endpoint"
   }
 }
+
+iam_roles = {
+
+  eks_cluster = {
+    role_name       = "eks-cluster-role"
+    trusted_service = "eks.amazonaws.com"
+
+    policy_arns = [
+      "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+      "arn:aws:iam::aws:policy/AmazonEKSWorkerNodeMinimalPolicy",
+      "arn:aws:iam::aws:policy/AmazonEKSComputePolicy",
+      "arn:aws:iam::aws:policy/AmazonEKSNetworkingPolicy"
+    ]
+
+    inline_policies = {}
+  }
+
+  eks_node = {
+    role_name       = "eks-node-role"
+    trusted_service = "ec2.amazonaws.com"
+
+    policy_arns = [
+      "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+      "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+      "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+    ]
+
+    inline_policies = {}
+  }
+
+  # pod_identity = {
+  #   role_name       = "external-dns-role"
+  #   trusted_service = "pods.eks.amazonaws.com"
+
+  #   policy_arns = []
+
+  #   inline_policies = {
+  #     route53 = file("${path.module}/policies/route53.json")
+  #   }
+  # }
+
+}
+
+eks = {
+  authentication_mode = "API_AND_CONFIG_MAP"
+  cluster_version = "1.35"
+  endpoint_private_access = true
+  endpoint_public_access = true
+  enabled_cluster_log_types = ["api", "audit", "scheduler", "controllerManager"]
+  bootstrap_cluster_creator_admin_permissions = true
+  deletion_protection = false
+  public_access_cidrs = ["0.0.0.0/0"]
+  node_groups = {
+    ng = {
+      instance_type  = ["t3a.medium"]
+      desired_size   = 2
+      max_size       = 2
+      min_size       = 2
+      capacity_type  = "ON_DEMAND"
+    }
+  }
+}
+
+addons = {
+  vpc-cni = "v1.21.1-eksbuild.5"
+  # aws-ebs-csi-driver = "v1.56.0-eksbuild.1"
+  eks-pod-identity-agent = "v1.3.10-eksbuild.2"
+}

@@ -30,6 +30,7 @@ module "vpc" {
 #--------------------------------------------------------------------------------#
 
 module "bastion" {
+  depends_on = [ module.vpc ]
   source         = "../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["bastion_sg_name"]
@@ -38,6 +39,7 @@ module "bastion" {
 }
 
 module "vpn" {
+  depends_on = [ module.vpc ]
   source         = "../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["vpn_sg_name"]
@@ -45,6 +47,7 @@ module "vpn" {
   vpc_id         = module.vpc.vpc_id
 }
 module "rds" {
+  depends_on = [ module.vpc ]
   source         = "../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["rds_sg_name"]
@@ -53,6 +56,7 @@ module "rds" {
 }
 
 module "elasticache" {
+  depends_on = [ module.vpc ]
   source         = "../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["elasticache_sg_name"]
@@ -60,6 +64,7 @@ module "elasticache" {
   vpc_id         = module.vpc.vpc_id
 }
 module "controlplane" {
+  depends_on = [ module.vpc ]
   source         = "../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["controlplane_sg_name"]
@@ -67,6 +72,7 @@ module "controlplane" {
   vpc_id         = module.vpc.vpc_id
 }
 module "nodegroup" {
+  depends_on = [ module.vpc ]
   source         = "../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["nodegroup_sg_name"]
@@ -75,6 +81,7 @@ module "nodegroup" {
 }
 
 module "external_alb" {
+  depends_on = [ module.vpc ]
   source         = "../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["external_alb_sg_name"]
@@ -83,6 +90,7 @@ module "external_alb" {
 }
 
 module "interface_endpoint_sg" {
+  depends_on = [ module.vpc ]
   source         = "../../modules/network/sg"
   common_tags    = var.common_vars["common_tags"]
   sg_name        = var.sg["interface_endpoint_sg_name"]
@@ -91,8 +99,60 @@ module "interface_endpoint_sg" {
 }
 
 module "sg_rules" {
+  depends_on = [ module.vpc ]
   source = "../../modules/network/sg_rules"
   rules  = local.resolved_sg_rules
 }
 
+#--------------------------------------------------------------------------------#
+###                            IAM Roles                                       ###
+#--------------------------------------------------------------------------------#
 
+module "iam_roles" {
+
+  source = "../../modules/iam"
+
+  for_each = var.iam_roles
+
+  role_name       = each.value.role_name
+  trusted_service = each.value.trusted_service
+
+  policy_arns     = each.value.policy_arns
+  inline_policies = each.value.inline_policies
+  common_tags     = var.common_vars["common_tags"]
+}
+
+
+#--------------------------------------------------------------------------------#
+###                                EKS Module                                  ###
+#--------------------------------------------------------------------------------#
+
+module "eks_module" {
+  depends_on = [ module.vpc ]
+  source                                      = "../../modules/compute/eks/cluster"
+  common_tags                                 = var.common_vars["common_tags"]
+  cluster_role_arn                            = module.iam_roles["eks_cluster"].role_arn
+  node_role_arn                               = module.iam_roles["eks_node"].role_arn
+  cluster_subnet_ids                          = module.vpc.web_subnet_ids
+  cluster_security_group_ids                  = [module.controlplane.sg_id]
+  ng_security_group_ids                       = [module.nodegroup.sg_id]
+  ng_subnet_ids                               = module.vpc.web_subnet_ids
+  authentication_mode                         = var.eks["authentication_mode"]
+  cluster_version                             = var.eks["cluster_version"]
+  endpoint_private_access                     = var.eks["endpoint_private_access"]
+  endpoint_public_access                      = var.eks["endpoint_public_access"]
+  enabled_cluster_log_types                   = var.eks["enabled_cluster_log_types"]
+  bootstrap_cluster_creator_admin_permissions = var.eks["bootstrap_cluster_creator_admin_permissions"]
+  deletion_protection                         = var.eks["deletion_protection"]
+  public_access_cidrs                         = var.eks["public_access_cidrs"]
+  node_groups                                 = var.eks["node_groups"]
+}
+
+module "addons" {
+  depends_on = [ module.eks_module ]
+  source        = "../../modules/compute/eks/addons"
+  for_each      = var.addons
+  cluster_name  = module.eks_module.cluster_id
+  addon_name    = each.key
+  addon_version = each.value
+}

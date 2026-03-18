@@ -32,9 +32,38 @@ resource "aws_eks_cluster" "example" {
 }
 
 
+# resource "aws_launch_template" "node" {
+#   for_each = var.node_groups
+#   name = "${local.prefix}-nodegroup-launch-template"
+
+#   vpc_security_group_ids = var.ng_security_group_ids
+
+#   block_device_mappings {
+#     device_name = "/dev/xvda"
+
+#     ebs {
+#       volume_size = 20
+#     }
+#   }
+#   key_name = "id_ed25519"
+
+#   tag_specifications {
+#     resource_type = "instance"
+#     tags = merge(
+#       var.common_tags,
+#       {
+#         Name = "${local.prefix}-ng-${each.key}"
+#       }
+#     )
+#   }
+#   lifecycle {
+#    create_before_destroy = true
+#   }
+# }
 resource "aws_launch_template" "node" {
   for_each = var.node_groups
-  name = "${local.prefix}-nodegroup-launch-template"
+
+  name = "${local.prefix}-${each.key}-lt"
 
   vpc_security_group_ids = var.ng_security_group_ids
 
@@ -45,7 +74,8 @@ resource "aws_launch_template" "node" {
       volume_size = 20
     }
   }
-  key_name = "siva"
+
+  key_name = "id_ed25519"
 
   tag_specifications {
     resource_type = "instance"
@@ -56,8 +86,9 @@ resource "aws_launch_template" "node" {
       }
     )
   }
+
   lifecycle {
-   create_before_destroy = true
+    create_before_destroy = true
   }
 }
 # NodeGroup

@@ -70,3 +70,32 @@ output "interface_endpoint_sg" {
   description = "Interface Endpoint Sg ID"
   value       = module.interface_endpoint_sg.sg_id
 }
+
+
+#-----------------------------------------------------------------------------------#
+###                              IAM Role Outputs                                 ###
+#-----------------------------------------------------------------------------------#
+output "iam_role_arns" {
+  description = "IAM Roles ARNs"
+  value       = { for key, role in module.iam_roles : key => role.role_arn }
+}
+output "iam_role_names" {
+  description = "IAM Roles Names"
+  value       = { for key, role in module.iam_roles : key => role.role_name }
+}
+
+#-----------------------------------------------------------------------------------#
+###                             EKS module Outputs                                ###
+#-----------------------------------------------------------------------------------#
+output "eks_cluster_arn" {
+  description = "EKS Cluster ARN"
+  value       = module.eks_module.cluster_arn
+}
+output "eks_cluster_endpoint" {
+  description = "EKS Cluster Endpoint"
+  value       = module.eks_module.cluster_endpoint
+}
+output "eks_cluster_id" {
+  description = "EKS Cluster ID"
+  value       = module.eks_module.cluster_id
+}

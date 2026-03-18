@@ -3,10 +3,6 @@ variable "common_tags" {
   type        = map(string)
 }
 
-variable "identity_name" {
-  description = "Name identifier for the IAM Pod Identity Role"
-  type        = string
-}
 
 variable "namespace" {
   description = "K8s Namespaces"
