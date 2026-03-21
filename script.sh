@@ -76,7 +76,7 @@ cd "$LIVE_PATH"
 # Terraform Init
 echo ""
 echo "▶ Terraform Init"
-terraform init -backend-config="$ENV_TFVARS_PATH/backend.tfvars"
+terraform init -upgrade -backend-config="$ENV_TFVARS_PATH/backend.tfvars"
 
 if [ "$ACTION_CHOICE" == "1" ]; then
 

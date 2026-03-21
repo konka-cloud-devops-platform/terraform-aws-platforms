@@ -31,10 +31,6 @@ variable "vpc" {
 variable "sg" {
   description = "SG configuration"
   type = object({
-    bastion_sg_name                   = string
-    bastion_sg_description            = string
-    vpn_sg_name                       = string
-    vpn_sg_description                = string
     rds_sg_name                       = string
     rds_sg_description                = string
     elasticache_sg_name               = string
@@ -98,4 +94,13 @@ variable "eks" {
 variable "addons" {
   description = "EKS addons configuration"
   type        = map(string)
+}
+
+variable "pod_identity" {
+  description = "EKS Pod Identity configuration"
+  type = map(object({
+    namespace            = string
+    service_account_name = string
+    iam_role_key         = string
+  }))
 }

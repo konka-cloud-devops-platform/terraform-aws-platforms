@@ -1,5 +1,5 @@
 locals {
-  name = "${title(replace(var.common_tags["Environment"], "-", ""))}${title(replace(var.common_tags["Project"], "-", ""))}${title(replace(var.role_name, "-", ""))}"
+  name = "${title(replace(var.common_tags["Environment"], "_", ""))}${title(replace(var.common_tags["Project"], "_", ""))}${title(replace(var.role_name, "_", ""))}"
 }
 resource "aws_iam_role" "role" {
 

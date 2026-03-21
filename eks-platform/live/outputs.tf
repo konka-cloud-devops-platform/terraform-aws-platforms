@@ -30,16 +30,6 @@ output "db_subnet_group_name" {
 #-----------------------------------------------------------------------------------#
 ###                              Security Group Outputs                           ###
 #-----------------------------------------------------------------------------------#
-output "bastion" {
-  description = "Bastion Sg ID"
-  value       = module.bastion.sg_id
-}
-
-
-output "vpn" {
-  description = "VPN Sg ID"
-  value       = module.vpn.sg_id
-}
 
 output "elasticache" {
   description = "ElastiCache Sg ID"

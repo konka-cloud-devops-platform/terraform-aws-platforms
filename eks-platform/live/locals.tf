@@ -1,7 +1,5 @@
 locals {
   sg_map = {
-    bastion            = module.bastion.sg_id
-    vpn                = module.vpn.sg_id
     rds                = module.rds.sg_id
     elasticache        = module.elasticache.sg_id
     controlplane       = module.controlplane.sg_id

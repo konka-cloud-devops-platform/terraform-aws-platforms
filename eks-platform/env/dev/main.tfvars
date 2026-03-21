@@ -3,7 +3,7 @@ common_vars = {
   common_tags = {
     Owner       = "konka"
     Environment = "dev"
-    Project     = "moneylag"
+    Project     = "carvo"
   }
 }
 
@@ -34,10 +34,6 @@ vpc = {
 }
 
 sg = {
-  bastion_sg_name                   = "bastion"
-  bastion_sg_description            = "Security group for bastion hosts"
-  vpn_sg_name                       = "vpn"
-  vpn_sg_description                = "Security group for VPN"
   rds_sg_name                       = "rds"
   rds_sg_description                = "Security group for RDS instances"
   elasticache_sg_name               = "elasticache"
@@ -55,62 +51,6 @@ sg = {
 sg_rules = {
 
   # -----------------------
-  # Bastion SG Rules
-  # -----------------------
-  bastion_ssh = {
-    type                = "ingress"
-    from_port           = 22
-    to_port             = 22
-    protocol            = "tcp"
-    description         = "Allow SSH access from anywhere"
-    cidr_blocks         = ["0.0.0.0/0"]
-    security_group_name = "bastion"
-  }
-
-  # -----------------------
-  # VPN SG Rules
-  # -----------------------
-  vpn_ssh = {
-    type                = "ingress"
-    from_port           = 22
-    to_port             = 22
-    protocol            = "tcp"
-    description         = "This rule allows all traffic from internet on 22"
-    cidr_blocks         = ["0.0.0.0/0"]
-    security_group_name = "vpn"
-  }
-
-  vpn_https = {
-    type                = "ingress"
-    from_port           = 443
-    to_port             = 443
-    protocol            = "tcp"
-    description         = "This rule allows all traffic from internet on 443"
-    cidr_blocks         = ["0.0.0.0/0"]
-    security_group_name = "vpn"
-  }
-
-  vpn_et = {
-    type                = "ingress"
-    from_port           = 943
-    to_port             = 943
-    protocol            = "tcp"
-    description         = "This rule allows all traffic from internet on 943"
-    cidr_blocks         = ["0.0.0.0/0"]
-    security_group_name = "vpn"
-  }
-
-  vpn_udp = {
-    type                = "ingress"
-    from_port           = 1194
-    to_port             = 1194
-    protocol            = "udp"
-    description         = "This rule allows all traffic from internet on 1194"
-    cidr_blocks         = ["0.0.0.0/0"]
-    security_group_name = "vpn"
-  }
-
-  # -----------------------
   # RDS SG Rules
   # -----------------------
   nodegroup_rds = {
@@ -123,25 +63,6 @@ sg_rules = {
     source_security_group_name = "nodegroup"
   }
 
-  vpn_rds = {
-    type                       = "ingress"
-    from_port                  = 3306
-    to_port                    = 3306
-    protocol                   = "tcp"
-    description                = "This rule allows all traffic from vpn to rds on 3306"
-    security_group_name        = "rds"
-    source_security_group_name = "vpn"
-  }
-
-  bastion_rds = {
-    type                       = "ingress"
-    from_port                  = 3306
-    to_port                    = 3306
-    protocol                   = "tcp"
-    description                = "This rule allows all traffic from bastion to rds on 3306"
-    security_group_name        = "rds"
-    source_security_group_name = "bastion"
-  }
 
   # -----------------------
   # ElastiCache SG Rules
@@ -154,26 +75,6 @@ sg_rules = {
     description                = "This rule allows all traffic from nodegroup to elasticache on 6379"
     security_group_name        = "elasticache"
     source_security_group_name = "nodegroup"
-  }
-
-  vpn_elasticache = {
-    type                       = "ingress"
-    from_port                  = 6379
-    to_port                    = 6379
-    protocol                   = "tcp"
-    description                = "This rule allows all traffic from vpn to elasticache on 6379"
-    security_group_name        = "elasticache"
-    source_security_group_name = "vpn"
-  }
-
-  bastion_elasticache = {
-    type                       = "ingress"
-    from_port                  = 6379
-    to_port                    = 6379
-    protocol                   = "tcp"
-    description                = "This rule allows all traffic from bastion to elasticache on 6379"
-    security_group_name        = "elasticache"
-    source_security_group_name = "bastion"
   }
 
   # -----------------------
@@ -270,7 +171,7 @@ sg_rules = {
 iam_roles = {
 
   eks_cluster = {
-    role_name       = "eks-cluster-role"
+    role_name       = "Cluster_Role"
     trusted_service = "eks.amazonaws.com"
 
     policy_arns = [
@@ -284,7 +185,7 @@ iam_roles = {
   }
 
   eks_node = {
-    role_name       = "eks-node-role"
+    role_name       = "Node_Role"
     trusted_service = "ec2.amazonaws.com"
 
     policy_arns = [
@@ -296,16 +197,16 @@ iam_roles = {
     inline_policies = {}
   }
 
-  # pod_identity = {
-  #   role_name       = "external-dns-role"
-  #   trusted_service = "pods.eks.amazonaws.com"
+  ebs_pod_identity = {
+    role_name       = "EBS_CSI_Driver_Role"
+    trusted_service = "pods.eks.amazonaws.com"
 
-  #   policy_arns = []
+    policy_arns = []
 
-  #   inline_policies = {
-  #     route53 = file("${path.module}/policies/route53.json")
-  #   }
-  # }
+    inline_policies = {
+      ebs-csi-driver = "policies/ebs-csi-policy.json"
+    }
+  }
 
 }
 
@@ -320,7 +221,7 @@ eks = {
   public_access_cidrs = ["0.0.0.0/0"]
   node_groups = {
     ng = {
-      instance_type  = ["t3a.medium"]
+      instance_type  = ["t3a.small"]
       desired_size   = 2
       max_size       = 2
       min_size       = 2
@@ -329,8 +230,16 @@ eks = {
   }
 }
 
+pod_identity = {
+  ebs = {
+    namespace            = "kube-system"
+    service_account_name = "ebs-csi-controller-sa"
+    iam_role_key         = "ebs_pod_identity"
+  }
+}
+
 addons = {
   vpc-cni = "v1.21.1-eksbuild.5"
-  # aws-ebs-csi-driver = "v1.56.0-eksbuild.1"
+  aws-ebs-csi-driver = "v1.56.0-eksbuild.1"
   eks-pod-identity-agent = "v1.3.10-eksbuild.2"
 }
