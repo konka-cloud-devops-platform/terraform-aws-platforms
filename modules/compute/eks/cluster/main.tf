@@ -1,5 +1,5 @@
 locals {
-  prefix = "${var.common_tags["Project"]}-${var.common_tags["Environment"]}"
+  prefix = "${var.common_tags["Environment"]}-${var.common_tags["Project"]}"
 }
 resource "aws_eks_cluster" "example" {
   name = "${local.prefix}-eks-cluster"
@@ -31,35 +31,6 @@ resource "aws_eks_cluster" "example" {
   )
 }
 
-
-# resource "aws_launch_template" "node" {
-#   for_each = var.node_groups
-#   name = "${local.prefix}-nodegroup-launch-template"
-
-#   vpc_security_group_ids = var.ng_security_group_ids
-
-#   block_device_mappings {
-#     device_name = "/dev/xvda"
-
-#     ebs {
-#       volume_size = 20
-#     }
-#   }
-#   key_name = "id_ed25519"
-
-#   tag_specifications {
-#     resource_type = "instance"
-#     tags = merge(
-#       var.common_tags,
-#       {
-#         Name = "${local.prefix}-ng-${each.key}"
-#       }
-#     )
-#   }
-#   lifecycle {
-#    create_before_destroy = true
-#   }
-# }
 resource "aws_launch_template" "node" {
   for_each = var.node_groups
 

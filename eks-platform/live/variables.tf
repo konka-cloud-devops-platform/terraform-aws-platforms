@@ -20,6 +20,7 @@ variable "vpc" {
     enable_eks_cluster_tags  = bool
     enable_internal_elb_tags = bool
     enable_external_elb_tags = bool
+    enable_karpenter         = bool
     vpc_endpoints = map(object({
       service = string
       type    = string # Gateway | Interface
@@ -43,6 +44,7 @@ variable "sg" {
     external_alb_sg_description       = string
     interface_endpoint_sg_name        = string
     interface_endpoint_sg_description = string
+    enable_karpenter_node_tags        = bool
   })
 }
 

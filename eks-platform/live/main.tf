@@ -23,6 +23,7 @@ module "vpc" {
   enable_eks_cluster_tags  = var.vpc["enable_eks_cluster_tags"]
   enable_internal_elb_tags = var.vpc["enable_internal_elb_tags"]
   enable_external_elb_tags = var.vpc["enable_external_elb_tags"]
+  enable_karpenter         = var.vpc["enable_karpenter"]
 }
 
 #--------------------------------------------------------------------------------#
@@ -53,11 +54,12 @@ module "controlplane" {
   vpc_id         = module.vpc.vpc_id
 }
 module "nodegroup" {
-  source         = "../../modules/network/sg"
-  common_tags    = var.common_vars["common_tags"]
-  sg_name        = var.sg["nodegroup_sg_name"]
-  sg_description = var.sg["nodegroup_sg_description"]
-  vpc_id         = module.vpc.vpc_id
+  source           = "../../modules/network/sg"
+  common_tags      = var.common_vars["common_tags"]
+  sg_name          = var.sg["nodegroup_sg_name"]
+  sg_description   = var.sg["nodegroup_sg_description"]
+  vpc_id           = module.vpc.vpc_id
+  enable_karpenter = var.sg["enable_karpenter_node_tags"]
 }
 
 module "external_alb" {

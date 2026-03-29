@@ -21,6 +21,10 @@ locals {
     "kubernetes.io/role/elb" = "1"
   } : {}
 
+  karpenter_tags = var.enable_karpenter ? {
+    "karpenter.sh/discovery" = "${local.prefix}-eks-cluster"
+  } : {}
+
 }
 
 #------------------------------------------------------------------------------#
@@ -76,7 +80,8 @@ resource "aws_subnet" "web_subnets" {
       Project     = var.common_tags["Project"]
     },
     local.eks_cluster_tags,
-    local.external_elb_tags
+    local.external_elb_tags,
+    local.karpenter_tags
   )
 }
 
@@ -94,7 +99,8 @@ resource "aws_subnet" "app_subnets" {
       Project     = var.common_tags["Project"]
     },
     local.eks_cluster_tags,
-    local.internal_elb_tags
+    local.internal_elb_tags,
+    local.karpenter_tags
   )
 }
 

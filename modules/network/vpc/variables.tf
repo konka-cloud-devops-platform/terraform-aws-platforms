@@ -85,3 +85,9 @@ variable "enable_external_elb_tags" {
   type    = bool
   default = false
 }
+
+variable enable_karpenter {
+  type        = bool
+  default     = false
+  description = "Enable Karpenter discovery tags on subnets and security groups"
+}
